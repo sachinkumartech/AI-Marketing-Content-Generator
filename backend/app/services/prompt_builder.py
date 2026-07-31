@@ -1,4 +1,5 @@
 from app.schemas.schemas import PostGenerationRequest
+from app.utils.sanitizer import sanitize_input
 
 class PromptBuilder:
     @staticmethod
@@ -32,9 +33,17 @@ class PromptBuilder:
         }
         emoji_guide = emoji_guides.get(req.emoji_usage.lower(), "Moderate emojis.")
 
+        # Sanitize user string inputs explicitly before building prompt
+        safe_topic = sanitize_input(req.topic)
+        safe_description = sanitize_input(req.description)
+        safe_goal = sanitize_input(req.campaign_goal)
+        safe_platform = sanitize_input(req.platform)
+        safe_tone = sanitize_input(req.tone)
+        safe_audience = sanitize_input(req.target_audience)
+
         cta_instruction = ""
         if req.include_cta:
-            cta_instruction = f"Provide a clear, engaging Call to Action (CTA) matching the campaign goal: '{req.campaign_goal}'."
+            cta_instruction = f"Provide a clear, engaging Call to Action (CTA) matching the campaign goal: '{safe_goal}'."
         else:
             cta_instruction = "Do not write an explicit Call to Action section."
 
@@ -48,12 +57,12 @@ class PromptBuilder:
 Generate exactly {req.num_variations} variations of a social media post in a valid, parsable JSON format.
 
 Input Parameters:
-- Topic: {req.topic}
-- Description: {req.description}
-- Campaign Goal: {req.campaign_goal}
-- Target Platform: {req.platform}
-- Writing Tone: {req.tone}
-- Target Audience: {req.target_audience}
+- Topic: {safe_topic}
+- Description: {safe_description}
+- Campaign Goal: {safe_goal}
+- Target Platform: {safe_platform}
+- Writing Tone: {safe_tone}
+- Target Audience: {safe_audience}
 - Length Target: {req.post_length}
 - Emoji Density: {req.emoji_usage}
 

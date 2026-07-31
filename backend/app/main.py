@@ -1,10 +1,15 @@
 import sys
 import os
+import logging
+import traceback
+import asyncio
+from contextlib import asynccontextmanager
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 from beanie import init_beanie
 
 from app.config.config import settings
@@ -12,10 +17,8 @@ from app.routers import social_router, auth_router, advertisement_router, email_
 from app.models.models import User, SocialMediaHistory, AdvertisementHistory, EmailHistory
 from app.database.session import init_db, close_db, db
 
-from fastapi import Request
-from fastapi.responses import JSONResponse
-import traceback
-import asyncio
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("main")
 
 db_init_lock = None
 db_initialized = False
@@ -36,19 +39,19 @@ async def initialize_db_if_needed():
                     document_models=[User, SocialMediaHistory, AdvertisementHistory, EmailHistory]
                 )
                 
-                # Seed default user for public access bypass
+                # Seed default user for public access bypass with secure bcrypt hash
                 existing_user = await User.find_one(User.email == "admin@aethera.ai")
                 if not existing_user:
                     from app.auth.auth import get_password_hash
                     new_user = User(
                         email="admin@aethera.ai",
-                        hashed_password=get_password_hash("password123"),
+                        hashed_password=get_password_hash("Password123!"),
                         full_name="Default Marketer"
                     )
                     await new_user.insert()
                 elif not existing_user.hashed_password.startswith("$2"):
                     from app.auth.auth import get_password_hash
-                    existing_user.hashed_password = get_password_hash("password123")
+                    existing_user.hashed_password = get_password_hash("Password123!")
                     await existing_user.save()
                     
                 db_initialized = True
@@ -75,18 +78,23 @@ async def ensure_db_middleware(request: Request, call_next):
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    # Log detailed traceback internally for debugging
     tb = traceback.format_exc()
+    logger.error(f"Unhandled Exception on {request.method} {request.url.path}: {str(exc)}\n{tb}")
+    
+    # Hide internal tracebacks, exception details, and auth credentials from public API responses
     return JSONResponse(
         status_code=500,
         content={
-            "detail": str(exc),
-            "traceback": tb.splitlines()
+            "detail": "An internal server error occurred. Please try again later.",
+            "status": "error"
         }
     )
-# Configure CORS for frontend connections
+
+# Configure CORS securely from settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict to client domain in production environments
+    allow_origins=settings.get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
