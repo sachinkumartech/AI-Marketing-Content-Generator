@@ -7,11 +7,13 @@ import AdvertisementGenerator from '../pages/AdvertisementGenerator';
 import EmailGenerator from '../pages/EmailGenerator';
 import HistoryPage from '../pages/History';
 import ProfilePage from '../pages/Profile';
+import LoginPage from '../pages/LoginPage';
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/social-generator" element={<SocialMediaGenerator />} />
       <Route path="/advertisement-generator" element={<AdvertisementGenerator />} />
