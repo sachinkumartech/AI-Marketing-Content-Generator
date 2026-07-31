@@ -109,7 +109,7 @@ export default function Dashboard() {
         <div>
           <span className="text-xs text-neon-blue font-bold tracking-widest uppercase">Workspace Management</span>
           <h2 className="text-3xl font-extrabold text-white mt-1">
-            Welcome back, <span className="text-gradient-neon">{user.name}</span>
+            Welcome back, <span className="text-gradient-neon">{user?.full_name || user?.name || user?.email?.split('@')[0] || 'Marketer'}</span>
           </h2>
           <p className="text-sm text-white/50 mt-1">What would you like AI to generate today?</p>
           

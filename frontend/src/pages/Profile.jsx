@@ -26,7 +26,7 @@ export default function ProfilePage() {
             <User className="w-8 h-8 text-dark-bg" />
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: 'white' }}>{user.name}</h3>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: 'white' }}>{user?.full_name || user?.name || user?.email?.split('@')[0] || 'User'}</h3>
             <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>SaaS Workspace Owner</span>
           </div>
         </div>
