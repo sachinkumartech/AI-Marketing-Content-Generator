@@ -30,31 +30,35 @@ async def initialize_db_if_needed():
     if not db_initialized:
         async with db_init_lock:
             if not db_initialized:
-                # Initialize Motor client
-                await init_db()
-                
-                # Initialize Beanie
-                await init_beanie(
-                    database=db.client.get_database("ai_marketing_generator"),
-                    document_models=[User, SocialMediaHistory, AdvertisementHistory, EmailHistory]
-                )
-                
-                # Seed default user for public access bypass with secure bcrypt hash
-                existing_user = await User.find_one(User.email == "admin@aethera.ai")
-                if not existing_user:
-                    from app.auth.auth import get_password_hash
-                    new_user = User(
-                        email="admin@aethera.ai",
-                        hashed_password=get_password_hash("Password123!"),
-                        full_name="Default Marketer"
-                    )
-                    await new_user.insert()
-                elif not existing_user.hashed_password.startswith("$2"):
-                    from app.auth.auth import get_password_hash
-                    existing_user.hashed_password = get_password_hash("Password123!")
-                    await existing_user.save()
+                try:
+                    # Initialize Motor client
+                    await init_db()
                     
-                db_initialized = True
+                    # Initialize Beanie
+                    await init_beanie(
+                        database=db.client.get_database("ai_marketing_generator"),
+                        document_models=[User, SocialMediaHistory, AdvertisementHistory, EmailHistory]
+                    )
+                    
+                    # Seed default user for public access bypass with secure bcrypt hash
+                    existing_user = await User.find_one(User.email == "admin@aethera.ai")
+                    if not existing_user:
+                        from app.auth.auth import get_password_hash
+                        new_user = User(
+                            email="admin@aethera.ai",
+                            hashed_password=get_password_hash("Password123!"),
+                            full_name="Default Marketer"
+                        )
+                        await new_user.insert()
+                    elif not existing_user.hashed_password.startswith("$2"):
+                        from app.auth.auth import get_password_hash
+                        existing_user.hashed_password = get_password_hash("Password123!")
+                        await existing_user.save()
+                        
+                    db_initialized = True
+                except Exception as e:
+                    logger.error(f"Database initialization error: {e}")
+                    raise
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

@@ -22,9 +22,6 @@ class Settings(BaseSettings):
 
     def get_cors_origins(self) -> List[str]:
         if not self.CORS_ORIGINS or self.CORS_ORIGINS.strip() == "*":
-            if self.ENVIRONMENT.lower() == "production":
-                logger.warning("CORS_ORIGINS set to wildcard '*' in production mode!")
-                return ["http://localhost:5173"]
             return ["*"]
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
