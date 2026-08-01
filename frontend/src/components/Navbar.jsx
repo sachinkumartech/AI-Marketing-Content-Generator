@@ -119,19 +119,19 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleOpenAuth('login')}
+              <Link
+                to="/login"
                 className="px-4 py-1.5 text-xs font-semibold text-white/80 hover:text-white hover:bg-white/5 rounded-full transition-all flex items-center gap-1.5"
               >
                 <LogIn className="w-3.5 h-3.5 text-neon-blue" />
                 Sign In
-              </button>
-              <button
-                onClick={() => handleOpenAuth('register')}
-                className="px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-neon-purple to-neon-blue hover:from-neon-blue hover:to-neon-cyan rounded-full shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all"
+              </Link>
+              <Link
+                to={isAuthenticated ? "/dashboard" : "/login"}
+                className="px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-neon-purple to-neon-blue hover:from-neon-blue hover:to-neon-cyan rounded-full shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all flex items-center gap-1"
               >
                 Get Started
-              </button>
+              </Link>
             </div>
           )}
         </div>

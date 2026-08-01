@@ -13,4 +13,4 @@ async def init_db():
 
 async def close_db():
     if db.client:
-        await db.client.close()
+        db.client.close()

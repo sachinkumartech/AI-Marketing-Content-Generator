@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from app.models.models import User
 from app.schemas.schemas import UserCreate, UserLogin, UserResponse, Token
 from app.auth.auth import get_password_hash, verify_password, create_access_token, get_current_user
+from app.config.config import settings
 from app.auth.rate_limiter import rate_limiter
 
 router = APIRouter()
@@ -25,10 +26,10 @@ async def register(user_in: UserCreate, request: Request):
         full_name=user_in.full_name
     )
     await new_user.insert()
-    return new_user
+    return UserResponse(id=str(new_user.id), email=new_user.email, full_name=new_user.full_name)
 
-@router.post("/login", response_model=Token)
-async def login(user_in: UserLogin, request: Request):
+@router.post("/login")
+async def login(user_in: UserLogin, request: Request, response: Response):
     client_ip = request.client.host if request.client else "127.0.0.1"
     
     # 1. Enforce Rate Limiting before verifying credentials
@@ -48,8 +49,36 @@ async def login(user_in: UserLogin, request: Request):
     rate_limiter.reset_failed_logins(client_ip, user_in.email)
 
     access_token = create_access_token(data={"sub": user.email, "user_id": str(user.id)})
-    return {"access_token": access_token, "token_type": "bearer"}
+    is_prod = settings.ENVIRONMENT.lower() == "production"
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=is_prod,
+        samesite="lax",
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+    return {
+        "message": "Successfully logged in",
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": str(user.id),
+            "email": user.email,
+            "full_name": user.full_name
+        }
+    }
 
+@router.post("/logout")
+async def logout(response: Response):
+    is_prod = settings.ENVIRONMENT.lower() == "production"
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=is_prod,
+        samesite="lax",
+    )
+    return {"message": "Successfully logged out"}
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):
-    return current_user
+    return UserResponse(id=str(current_user.id), email=current_user.email, full_name=current_user.full_name)

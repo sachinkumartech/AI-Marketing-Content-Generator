@@ -20,6 +20,7 @@ const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -37,15 +38,13 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Redirect on 401 Unauthorized
+// Response Interceptor: Clear cached credentials on 401 Unauthorized without forcing full page reloads
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('ai_marketing_token');
       localStorage.removeItem('ai_marketing_user');
-      // Force page reload or redirect
-      window.location.href = '/';
     }
     return Promise.reject(error);
   }
@@ -62,10 +61,19 @@ export const authAPI = {
   },
   login: async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
+    if (response.data && response.data.access_token) {
+      localStorage.setItem('ai_marketing_token', response.data.access_token);
+    }
     return response.data;
   },
   getMe: async () => {
     const response = await api.get('/auth/me');
+    return response.data;
+  },
+  logout: async () => {
+    localStorage.removeItem('ai_marketing_token');
+    localStorage.removeItem('ai_marketing_user');
+    const response = await api.post('/auth/logout');
     return response.data;
   },
 };
@@ -103,7 +111,7 @@ export const socialAPI = {
   },
   regenerate: async (id, variationIndex) => {
     const response = await api.post('/social-media/regenerate', {
-      id: parseInt(id, 10),
+      id: id,
       variation_index: parseInt(variationIndex, 10),
     });
     return response.data;
@@ -118,7 +126,7 @@ export const socialAPI = {
   },
   favorite: async (id, isFavorite) => {
     const response = await api.post('/social-media/favorite', {
-      id: parseInt(id, 10),
+      id: id,
       favorite: isFavorite,
     });
     return response.data;
@@ -186,7 +194,7 @@ export const advertisementAPI = {
   },
   regenerate: async (id, variationIndex) => {
     const response = await api.post('/advertisement/regenerate', {
-      id: parseInt(id, 10),
+      id: id,
       variation_index: parseInt(variationIndex, 10),
     });
     return response.data;
@@ -201,7 +209,7 @@ export const advertisementAPI = {
   },
   favorite: async (id, isFavorite) => {
     const response = await api.post('/advertisement/favorite', {
-      id: parseInt(id, 10),
+      id: id,
       favorite: isFavorite,
     });
     return response.data;

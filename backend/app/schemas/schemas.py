@@ -273,7 +273,7 @@ class AdVariation(BaseModel):
     video_prompt: str
     carousel_ideas: str
     best_posting_time: str
-    id: Optional[int] = None
+    id: Optional[str] = None
 
 
 class AdvertisementResponse(BaseModel):

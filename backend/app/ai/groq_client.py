@@ -58,16 +58,75 @@ class GroqAIClient(BaseAIClient):
                 num_variations = i
                 break
 
+        prompt_lower = prompt.lower()
+
+        # Handle Email Campaign Fallback
+        if "email" in prompt_lower or "subject_line" in prompt_lower or "preheader" in prompt_lower:
+            posts = []
+            for i in range(1, num_variations + 1):
+                posts.append({
+                    "subject_line": f"⚡ Supercharge Your Copy Velocity (Variation {i})",
+                    "preheader": "Automate high-converting B2B campaigns with modular AI workflows.",
+                    "salutation": "Hi {{FirstName}},",
+                    "body_paragraphs": [
+                        f"In modern SaaS marketing, draft speed and conversion quality can determine campaign ROI. Manual copywriting workflows often stall team progress.",
+                        f"With Aethera AI, your marketing team can generate target-aligned campaign copy across channels instantly, keeping brand consistency across every touchpoint."
+                    ],
+                    "call_to_action_text": "Claim Your Free Growth Audit",
+                    "sign_off": "Best regards,\nThe Aethera Team",
+                    "ps_note": "P.S. Book a call this week to receive custom prompt templates tailored to your niche.",
+                    "spam_word_score": 12,
+                    "readability_score": 88 + i,
+                    "estimated_open_rate": "38%",
+                    "estimated_click_rate": "6.5%",
+                    "psychological_framework": "PAS (Problem, Agitate, Solution)"
+                })
+            return {"posts": posts}
+
+        # Handle Advertisement Campaign Fallback
+        if "advertisement" in prompt_lower or "headline" in prompt_lower or "primary_text" in prompt_lower:
+            posts = []
+            for i in range(1, num_variations + 1):
+                posts.append({
+                    "headline": f"Scale SaaS Conversions 10x Faster (Var {i})",
+                    "primary_text": f"Stop spending days writing ad variations manually. Aethera AI generates high-converting ad copy, visual prompts, and target framework insights in seconds.",
+                    "description": "Enterprise-grade AI copywriting suite built for performance marketers.",
+                    "cta": "Start Free Trial",
+                    "hook": "🚀 Transform your ad ROI with automated high-velocity copy.",
+                    "marketing_framework_used": "AIDA Framework",
+                    "psychological_trigger": "Urgency & Social Proof",
+                    "target_audience_fit": "SaaS Founders, Performance Marketers, Media Buyers",
+                    "pain_points": "Slow copy production, low conversion rates, fatigue across ad creatives.",
+                    "benefits": "Instant variation generation, automated visual prompt creation, high CTR copy.",
+                    "usp": "Multi-channel modular AI engine customized for growth teams.",
+                    "seo_keywords": ["AI Ad Copy", "Meta Ads", "Google Ads Automation"],
+                    "google_keywords": ["AI marketing tool", "SaaS ad generator"],
+                    "hashtags": ["Adtech", "GrowthMarketing", "SaaS"],
+                    "estimated_ctr": "3.8%",
+                    "estimated_conversion_score": 90 + i,
+                    "ad_quality_score": 94 + i,
+                    "virality_score": 88 + i,
+                    "image_prompt": "Futuristic digital neon dashboard displaying rising growth charts on dark obsidian background, 8K hyper-realistic render.",
+                    "negative_prompt": "blurry, dark spots, messy text, watermarks",
+                    "suggested_color_palette": ["#00f0ff", "#ff007a", "#030014"],
+                    "alt_text": "Digital performance metrics graph glowing with neon highlights.",
+                    "video_prompt": "Dynamic motion graphic showing rapid text rendering into high-tech analytics screen.",
+                    "carousel_ideas": "Slide 1: The Problem with Manual Ads | Slide 2: AI Solution | Slide 3: Growth Metrics",
+                    "best_posting_time": "10:00 AM"
+                })
+            return {"posts": posts}
+
+        # Default Social Media Fallback
         platform = "LinkedIn"
-        if "instagram" in prompt.lower():
+        if "instagram" in prompt_lower:
             platform = "Instagram"
-        elif "twitter" in prompt.lower() or "x (twitter)" in prompt.lower():
+        elif "twitter" in prompt_lower or "x (twitter)" in prompt_lower:
             platform = "X (Twitter)"
-        elif "facebook" in prompt.lower():
+        elif "facebook" in prompt_lower:
             platform = "Facebook"
-        elif "threads" in prompt.lower():
+        elif "threads" in prompt_lower:
             platform = "Threads"
-        elif "pinterest" in prompt.lower():
+        elif "pinterest" in prompt_lower:
             platform = "Pinterest"
 
         posts = []

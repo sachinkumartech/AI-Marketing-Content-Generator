@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import AICoreCanvas from '../components/3d/AICoreCanvas';
 import { motion } from 'framer-motion';
 import { Sparkles, Brain, Share2, Mail, Box, Target, ArrowRight, Play } from 'lucide-react';
@@ -9,6 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function LandingPage() {
+  const { isAuthenticated } = useAuth();
   const [activeScene, setActiveScene] = useState(0);
   const navigate = useNavigate();
   
@@ -132,7 +134,7 @@ export default function LandingPage() {
                 className="flex flex-wrap items-center gap-4 pt-4"
               >
                 <Link
-                  to="/dashboard"
+                  to={isAuthenticated ? "/dashboard" : "/login"}
                   className="magnetic-btn px-8 py-3.5 rounded-full text-sm font-semibold text-dark-bg bg-gradient-to-r from-neon-blue to-neon-purple shadow-[0_0_25px_rgba(189,0,255,0.4)] flex items-center gap-2 hover:opacity-95 transition-all"
                 >
                   Get Started <ArrowRight className="w-4 h-4" />
@@ -254,7 +256,7 @@ export default function LandingPage() {
               </p>
               <div className="pt-4">
                 <Link
-                  to="/dashboard"
+                  to={isAuthenticated ? "/dashboard" : "/login"}
                   className="magnetic-btn inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold text-dark-bg bg-gradient-to-r from-neon-cyan to-neon-purple shadow-[0_0_25px_rgba(0,255,209,0.3)] hover:opacity-90 transition-all"
                 >
                   Create Your First Campaign Now <ArrowRight className="w-4 h-4" />

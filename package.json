@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "AI Marketing SaaS Root Starter",
   "scripts": {
-    "dev:backend": "cd backend && python -m uvicorn app.main:app --reload --port 8000",
+    "dev:backend": "cd backend && python -m uvicorn app.main:app --reload --reload-dir app --port 8000",
     "dev:frontend": "cd frontend && npm run dev",
     "dev": "npx -y concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "start": "npm run dev"

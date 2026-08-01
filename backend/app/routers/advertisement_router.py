@@ -6,7 +6,7 @@ from app.schemas.schemas import (
     FavoriteRequest, RegenerateRequest, ExportRequest, AdVariation
 )
 from app.services.advertisement_service import advertisement_service
-from app.utils.exporter import export_to_pdf, export_to_txt
+from app.utils.exporter import export_ad_to_pdf, export_ad_to_txt
 from app.auth.auth import get_current_user
 from app.models.models import User
 
@@ -81,7 +81,7 @@ async def toggle_log_favorite(req: FavoriteRequest, current_user: User = Depends
 
 @router.post("/export/pdf")
 def export_pdf(req: ExportRequest, current_user: User = Depends(get_current_user)):
-    pdf_bytes = export_to_pdf(req.post.dict(), req.topic, req.platform)
+    pdf_bytes = export_ad_to_pdf(req.post.dict(), req.topic, req.platform)
     headers = {
         'Content-Disposition': f'attachment; filename="aethera_{req.platform.lower()}_ad.pdf"'
     }
@@ -89,7 +89,7 @@ def export_pdf(req: ExportRequest, current_user: User = Depends(get_current_user
 
 @router.post("/export/txt")
 def export_txt(req: ExportRequest, current_user: User = Depends(get_current_user)):
-    txt_content = export_to_txt(req.post.dict(), req.topic, req.platform)
+    txt_content = export_ad_to_txt(req.post.dict(), req.topic, req.platform)
     headers = {
         'Content-Disposition': f'attachment; filename="aethera_{req.platform.lower()}_ad.txt"'
     }

@@ -2,14 +2,14 @@ import bcrypt
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, status, Request
+from fastapi.security import HTTPBearer
 from beanie import PydanticObjectId
 from app.config.config import settings
 from app.models.models import User
 from app.schemas.schemas import TokenData
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
@@ -32,13 +32,21 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def get_current_user(request: Request):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
     )
-    token = credentials.credentials
+    
+    token = request.cookies.get("access_token")
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+            
+    if not token:
+        raise credentials_exception
+        
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
         email: str = payload.get("sub")
@@ -52,7 +60,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     try:
         user = await User.get(PydanticObjectId(token_data.user_id))
     except Exception:
-        raise credentials_exception
+        user = await User.find_one(User.email == token_data.email)
+
+    if user is None:
+        user = await User.find_one(User.email == token_data.email)
 
     if user is None:
         raise credentials_exception

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
@@ -8,9 +8,15 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export default function LoginPage() {
-  const { login, signup, user } = useAuth();
+  const { login, signup, user, isAuthenticated, loading: authLoading } = useAuth();
   const showToast = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   const [mode, setMode] = useState('login'); // 'login' or 'register'
   const [email, setEmail] = useState('');
@@ -109,7 +115,7 @@ export default function LoginPage() {
                   : 'text-white/60 hover:text-white'
               }`}
             >
-              Register
+              Sign Up
             </button>
           </div>
 
@@ -228,6 +234,32 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          <div className="mt-4 text-center text-xs">
+            {mode === 'login' ? (
+              <span className="text-white/60">
+                Don't have an account yet?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setMode('register'); setErrorMessage(''); }}
+                  className="text-neon-cyan font-bold hover:underline cursor-pointer"
+                >
+                  Sign Up Here
+                </button>
+              </span>
+            ) : (
+              <span className="text-white/60">
+                Already registered?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setMode('login'); setErrorMessage(''); }}
+                  className="text-neon-blue font-bold hover:underline cursor-pointer"
+                >
+                  Sign In Here
+                </button>
+              </span>
+            )}
+          </div>
 
           <div className="mt-6 text-center text-xs text-white/50">
             Protected with AES-256 JWT & bcrypt encryption.

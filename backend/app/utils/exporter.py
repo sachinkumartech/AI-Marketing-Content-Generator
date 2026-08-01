@@ -140,6 +140,140 @@ def export_to_pdf(post: PostVariation, topic: str, platform: str) -> bytes:
     doc.build(story)
     return buffer.getvalue()
 
+def export_ad_to_txt(post: dict, topic: str, platform: str) -> str:
+    headline = post.get('headline', '')
+    primary_text = post.get('primary_text', post.get('primaryText', ''))
+    description = post.get('description', '')
+    cta = post.get('cta', '')
+    image_prompt = post.get('image_prompt', '')
+    framework = post.get('marketing_framework_used', '')
+    trigger = post.get('psychological_trigger', '')
+    ctr = post.get('estimated_ctr', '')
+    quality_score = post.get('ad_quality_score', 95)
+    
+    content = []
+    content.append("=" * 60)
+    content.append("AETHERA AI MARKETING AGENT - ADVERTISEMENT CAMPAIGN RECORD")
+    content.append("=" * 60)
+    content.append(f"Topic: {topic}")
+    content.append(f"Platform: {platform}")
+    content.append(f"Headline: {headline}")
+    content.append("-" * 60)
+    content.append(f"PRIMARY TEXT:\n{primary_text}")
+    content.append("-" * 60)
+    content.append(f"DESCRIPTION:\n{description}")
+    content.append("-" * 60)
+    content.append(f"CALL TO ACTION BUTTON:\n{cta}")
+    content.append("-" * 60)
+    content.append(f"MARKETING FRAMEWORK: {framework}")
+    content.append(f"PSYCHOLOGICAL TRIGGER: {trigger}")
+    content.append("-" * 60)
+    content.append(f"IMAGE PROMPT:\n{image_prompt}")
+    content.append("-" * 60)
+    content.append("PERFORMANCE METRICS:")
+    content.append(f"Estimated CTR: {ctr}")
+    content.append(f"Ad Quality Score: {quality_score}/100")
+    content.append("=" * 60)
+    return "\n\n".join(content)
+
+def export_ad_to_pdf(post: dict, topic: str, platform: str) -> bytes:
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+    styles = getSampleStyleSheet()
+    
+    title_style = ParagraphStyle(
+        'DocTitle',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=20,
+        leading=24,
+        textColor=colors.HexColor('#ff007a'),
+        spaceAfter=15
+    )
+    
+    section_title = ParagraphStyle(
+        'SectionTitle',
+        parent=styles['Heading2'],
+        fontName='Helvetica-Bold',
+        fontSize=11,
+        leading=15,
+        textColor=colors.HexColor('#00f0ff'),
+        spaceBefore=10,
+        spaceAfter=5
+    )
+    
+    body_style = ParagraphStyle(
+        'DocBody',
+        parent=styles['BodyText'],
+        fontName='Helvetica',
+        fontSize=9.5,
+        leading=13.5,
+        textColor=colors.HexColor('#333333'),
+        spaceAfter=10
+    )
+
+    meta_style = ParagraphStyle(
+        'DocMeta',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor('#666666')
+    )
+
+    story = []
+    
+    headline = post.get('headline', '')
+    primary_text = post.get('primary_text', post.get('primaryText', ''))
+    description = post.get('description', '')
+    cta = post.get('cta', '')
+    image_prompt = post.get('image_prompt', '')
+    framework = post.get('marketing_framework_used', '')
+    trigger = post.get('psychological_trigger', '')
+    ctr = post.get('estimated_ctr', '2.4%')
+    quality_score = post.get('ad_quality_score', 95)
+    
+    story.append(Paragraph(f"Aethera AI Generated Ad: {headline}", title_style))
+    story.append(Paragraph(f"<b>Campaign Topic:</b> {topic} &nbsp;|&nbsp; <b>Platform:</b> {platform}", meta_style))
+    story.append(Spacer(1, 15))
+    
+    story.append(Paragraph("PRIMARY AD TEXT", section_title))
+    story.append(Paragraph(primary_text.replace('\n', '<br/>'), body_style))
+    story.append(Spacer(1, 10))
+    
+    story.append(Paragraph("DESCRIPTION & CTA", section_title))
+    story.append(Paragraph(f"<b>Description:</b> {description}", body_style))
+    story.append(Paragraph(f"<b>CTA Button:</b> {cta}", body_style))
+    story.append(Spacer(1, 10))
+    
+    story.append(Paragraph("STRATEGY & FRAMEWORK", section_title))
+    story.append(Paragraph(f"<b>Marketing Framework:</b> {framework}", body_style))
+    story.append(Paragraph(f"<b>Psychological Trigger:</b> {trigger}", body_style))
+    story.append(Spacer(1, 10))
+    
+    story.append(Paragraph("IMAGE GENERATION PROMPT", section_title))
+    story.append(Paragraph(f"<i>\"{image_prompt}\"</i>", body_style))
+    story.append(Spacer(1, 15))
+    
+    data = [
+        ["Estimated CTR", "Ad Quality Score"],
+        [f"{ctr}", f"{quality_score}/100"]
+    ]
+    t = Table(data, colWidths=[250]*2)
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#030014')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#ff007a')),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0,0), (-1,0), 6),
+        ('BACKGROUND', (0,1), (-1,-1), colors.HexColor('#f5f5f5')),
+        ('GRID', (0,0), (-1,-1), 1, colors.HexColor('#eaeaea'))
+    ]))
+    story.append(t)
+    
+    doc.build(story)
+    return buffer.getvalue()
+
 def export_email_to_txt(post: dict, campaign_name: str) -> str:
     content = []
     content.append("=" * 60)

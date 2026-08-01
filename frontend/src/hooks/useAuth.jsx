@@ -5,48 +5,36 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('ai_marketing_token'));
   const [loading, setLoading] = useState(true);
 
-  // Restore current logged-in user session on application mount
+  // Check session via HttpOnly cookie on mount
   useEffect(() => {
     async function loadUser() {
-      const savedToken = localStorage.getItem('ai_marketing_token');
-      if (savedToken) {
-        try {
-          const userData = await authAPI.getMe();
-          setUser(userData);
-          setToken(savedToken);
-        } catch (error) {
-          console.error("Token verification failed, clearing session:", error);
-          localStorage.removeItem('ai_marketing_token');
-          localStorage.removeItem('ai_marketing_user');
-          setToken(null);
-          setUser(null);
-        }
+      try {
+        const userData = await authAPI.getMe();
+        setUser(userData);
+      } catch (error) {
+        console.error("Token verification failed, clearing session:", error);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     loadUser();
   }, []);
 
   const login = async (email, password) => {
-    const data = await authAPI.login(email, password);
-    if (data && data.access_token) {
-      localStorage.setItem('ai_marketing_token', data.access_token);
-      setToken(data.access_token);
+    try {
+      await authAPI.login(email, password);
       
       // Fetch full user profile
-      try {
-        const userData = await authAPI.getMe();
-        setUser(userData);
-        localStorage.setItem('ai_marketing_user', JSON.stringify(userData));
-      } catch (err) {
-        setUser({ email });
-      }
+      const userData = await authAPI.getMe();
+      setUser(userData);
       return true;
+    } catch (err) {
+      console.error("Login failed:", err);
+      throw err;
     }
-    return false;
   };
 
   const signup = async (fullName, email, password) => {
@@ -55,15 +43,18 @@ export function AuthProvider({ children }) {
     return await login(email, password);
   };
 
-  const logout = () => {
-    localStorage.removeItem('ai_marketing_token');
-    localStorage.removeItem('ai_marketing_user');
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!user, login, signup, logout, loading }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, signup, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
