@@ -18,16 +18,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
   if (!isOpen) return null;
 
-  // Password Policy Checks for Registration
-  const passwordChecks = {
-    length: password.length >= 8,
-    upper: /[A-Z]/.test(password),
-    lower: /[a-z]/.test(password),
-    number: /[0-9]/.test(password),
-    special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
-  };
-
-  const isPasswordValid = Object.values(passwordChecks).every(Boolean);
+  // Password Policy Checks for Registration - requires minimum 8 characters
+  const isPasswordValid = password.length >= 8;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +33,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
         onClose();
       } else {
         if (!isPasswordValid) {
-          setErrorMessage('Password does not meet the security requirements.');
+          setErrorMessage('Password must be at least 8 characters long.');
           setLoading(false);
           return;
         }
@@ -195,28 +187,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
             {/* Password security checklist for registration */}
             {mode === 'register' && password.length > 0 && (
-              <div className="p-3 bg-white/5 rounded-xl border border-white/5 space-y-1.5 text-xs text-white/60">
-                <div className="font-semibold text-white/80 mb-1 flex items-center gap-1.5">
+              <div className="p-2.5 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5 text-white/70">
                   <ShieldCheck className="w-3.5 h-3.5 text-neon-blue" />
-                  Password Requirements:
+                  <span>Password Requirement:</span>
                 </div>
-                <div className="grid grid-cols-2 gap-1">
-                  <span className={passwordChecks.length ? 'text-neon-cyan font-medium' : ''}>
-                    • 8+ Characters
-                  </span>
-                  <span className={passwordChecks.upper ? 'text-neon-cyan font-medium' : ''}>
-                    • 1 Uppercase (A-Z)
-                  </span>
-                  <span className={passwordChecks.lower ? 'text-neon-cyan font-medium' : ''}>
-                    • 1 Lowercase (a-z)
-                  </span>
-                  <span className={passwordChecks.number ? 'text-neon-cyan font-medium' : ''}>
-                    • 1 Number (0-9)
-                  </span>
-                  <span className={`col-span-2 ${passwordChecks.special ? 'text-neon-cyan font-medium' : ''}`}>
-                    • 1 Special Character (!@#$%^&*)
-                  </span>
-                </div>
+                <span className={password.length >= 8 ? 'text-neon-cyan font-bold' : 'text-amber-400 font-medium'}>
+                  {password.length >= 8 ? '✓ 8+ Characters' : `${password.length} / 8 characters`}
+                </span>
               </div>
             )}
 

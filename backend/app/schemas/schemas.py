@@ -4,32 +4,12 @@ from typing import List, Optional, Any
 from datetime import datetime
 from app.utils.sanitizer import sanitize_input
 
-# Password complexity regex rules
-PASSWORD_UPPERCASE_RE = re.compile(r'[A-Z]')
-PASSWORD_LOWERCASE_RE = re.compile(r'[a-z]')
-PASSWORD_DIGIT_RE = re.compile(r'[0-9]')
-PASSWORD_SPECIAL_RE = re.compile(r'[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>/?]')
-
-
 # --- User Authentication Schemas ---
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=8, max_length=128, description="Password must be 8-128 characters and include uppercase, lowercase, digit, and special character")
+    password: str = Field(..., min_length=8, max_length=128, description="Password must be at least 8 characters long")
     full_name: Optional[str] = Field(None, max_length=100)
-
-    @field_validator('password')
-    @classmethod
-    def validate_password_complexity(cls, v: str) -> str:
-        if not PASSWORD_UPPERCASE_RE.search(v):
-            raise ValueError("Password must contain at least one uppercase letter.")
-        if not PASSWORD_LOWERCASE_RE.search(v):
-            raise ValueError("Password must contain at least one lowercase letter.")
-        if not PASSWORD_DIGIT_RE.search(v):
-            raise ValueError("Password must contain at least one digit.")
-        if not PASSWORD_SPECIAL_RE.search(v):
-            raise ValueError("Password must contain at least one special character.")
-        return v
 
     @field_validator('full_name', mode='before')
     @classmethod
