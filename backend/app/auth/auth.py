@@ -1,4 +1,6 @@
-import bcrypt
+import hashlib
+import hmac
+import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -9,17 +11,38 @@ from app.config.config import settings
 from app.models.models import User
 from app.schemas.schemas import TokenData
 
+try:
+    import bcrypt
+except ImportError:
+    bcrypt = None
+
 security = HTTPBearer(auto_error=False)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
-        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+        if hashed_password.startswith("pbkdf2_sha256$"):
+            parts = hashed_password.split("$")
+            if len(parts) == 3:
+                salt, key_hex = parts[1], parts[2]
+                new_key = hashlib.pbkdf2_hmac('sha256', plain_password.encode('utf-8'), salt.encode('utf-8'), 100000)
+                return hmac.compare_digest(new_key.hex(), key_hex)
+        if bcrypt:
+            return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+        return False
     except Exception:
         return False
 
 def get_password_hash(password: str) -> str:
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+    if bcrypt:
+        try:
+            salt = bcrypt.gensalt()
+            return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        except Exception:
+            pass
+    # Fallback to stdlib hashlib pbkdf2_hmac (no C extensions required)
+    salt = secrets.token_hex(16)
+    key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000)
+    return f"pbkdf2_sha256${salt}${key.hex()}"
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
