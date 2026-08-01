@@ -43,8 +43,16 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
       }
     } catch (err) {
       console.error("Authentication failed:", err);
-      const detail = err?.response?.data?.detail || 'Authentication failed. Please check your credentials.';
-      setErrorMessage(typeof detail === 'string' ? detail : 'An error occurred during authentication.');
+      const detail = err?.response?.data?.detail;
+      let msg = 'Authentication failed. Please check your credentials.';
+      if (typeof detail === 'string') {
+        msg = detail;
+      } else if (Array.isArray(detail) && detail.length > 0) {
+        msg = detail.map(item => item.msg || item.message || String(item)).filter(Boolean).join('. ');
+      } else if (err?.message) {
+        msg = err.message;
+      }
+      setErrorMessage(msg);
     } finally {
       setLoading(false);
     }
