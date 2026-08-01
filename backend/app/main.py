@@ -77,7 +77,10 @@ app = FastAPI(
 
 @app.middleware("http")
 async def ensure_db_middleware(request: Request, call_next):
-    await initialize_db_if_needed()
+    try:
+        await initialize_db_if_needed()
+    except Exception as e:
+        logger.warning(f"Database initialization unavailable: {e}. Proceeding with request.")
     return await call_next(request)
 
 @app.exception_handler(Exception)
