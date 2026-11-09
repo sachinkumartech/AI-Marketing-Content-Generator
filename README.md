@@ -177,7 +177,7 @@ Ensure you have the following installed on your machine:
 - **Python**: `3.10` or higher
 - **Node.js**: `18.0` or higher (along with `npm` or `pnpm`)
 - **MongoDB**: A running local MongoDB instance or a free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster URI.
-- **Groq API Key**: Obtain a free API key from [Groq Console](https://console.groq.com/).
+- **Groq Account**: An account from [Groq Console](https://console.groq.com/) for LLM inference.
 
 ---
 
@@ -215,18 +215,11 @@ cd AI-Marketing-Content-Generator
    ```
 
 4. **Configure environment variables:**
-   Copy the `.env.example` file to `.env`:
+   Create your `.env` file from the provided template:
    ```bash
    cp .env.example .env
    ```
-   Open `.env` and fill in your credentials:
-   ```env
-   DATABASE_URL=mongodb://localhost:27017
-   GROQ_API_KEY=your_groq_api_key_here
-   JWT_SECRET=your_jwt_secret_here
-   JWT_ALGORITHM=HS256
-   ACCESS_TOKEN_EXPIRE_MINUTES=60
-   ```
+   Fill in your configuration values as outlined in `backend/.env.example`.
 
 5. **Start the FastAPI server:**
    ```bash
@@ -251,18 +244,11 @@ cd AI-Marketing-Content-Generator
    ```
 
 3. **Configure environment variables:**
-   Copy `.env.example` to `.env`:
+   Create your `.env` file from the provided template:
    ```bash
    cp .env.example .env
    ```
-   Configure `.env` as needed:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
-   ```
-   *(Optional)* To override the backend connection URL in local development:
-   ```env
-   VITE_API_BASE_URL=http://127.0.0.1:8000
-   ```
+   Fill in your configuration values as outlined in `frontend/.env.example`.
 
 4. **Launch the development server:**
    ```bash
@@ -279,22 +265,20 @@ cd AI-Marketing-Content-Generator
 
 ### Backend (`backend/.env`)
 
-| Variable | Required | Description | Example / Default |
-|---|---|---|---|
-| `DATABASE_URL` | **Yes** | MongoDB connection string (Local or MongoDB Atlas) | `mongodb://localhost:27017` or `mongodb+srv://...` |
-| `GROQ_API_KEY` | **Yes** | API key for Groq Cloud LLM inference | `gsk_...` |
-| `JWT_SECRET` | **Yes** | High-entropy secret key for signing JWT tokens | Random string (e.g., `openssl rand -hex 32`) |
-| `JWT_ALGORITHM` | No | Cryptographic algorithm for JWT encoding | `HS256` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | No | Expiration duration for access tokens | `60` |
-| `CORS_ORIGINS` | No | Allowed CORS origin URLs (comma-separated or `*`) | `*` |
-| `ENVIRONMENT` | No | Current deployment environment | `development` or `production` |
+Configure the backend variables according to [`backend/.env.example`](backend/.env.example):
+- `DATABASE_URL`: MongoDB connection string (Local MongoDB or MongoDB Atlas URI).
+- `GROQ_API_KEY`: Groq Cloud API access key for LLM inference.
+- `JWT_SECRET`: Secret key for signing and verifying JWT tokens.
+- `JWT_ALGORITHM`: Cryptographic signing algorithm.
+- `ACCESS_TOKEN_EXPIRE_MINUTES`: Token expiration duration in minutes.
+- `CORS_ORIGINS`: Allowed CORS origins for browser security.
+- `ENVIRONMENT`: Deployment environment tag.
 
 ### Frontend (`frontend/.env`)
 
-| Variable | Required | Description | Example / Default |
-|---|---|---|---|
-| `VITE_API_BASE_URL` | No | URL to the deployed backend server | `http://127.0.0.1:8000` (defaults to current domain) |
-| `GEMINI_API_KEY` | No | Optional Google Gemini key for frontend assist | `AIza...` |
+Configure the frontend variables according to [`frontend/.env.example`](frontend/.env.example):
+- `VITE_API_BASE_URL`: URL pointing to the running backend service.
+- `GEMINI_API_KEY`: API access key for optional client-side generative features.
 
 ---
 
@@ -352,9 +336,7 @@ This repository includes a native `render.yaml` Blueprint specification that dep
 4. Render automatically parses `render.yaml` and prepares two services:
    - **`ai-marketing-backend`**: FastAPI web service running Python 3.11.
    - **`ai-marketing-frontend`**: Vite React static site with SPA routing.
-5. Provide your production environment variables in the Render dashboard:
-   - `DATABASE_URL`: Your MongoDB Atlas URI.
-   - `GROQ_API_KEY`: Your production Groq API Key.
+5. Provide your production environment variables in the Render dashboard as outlined in `backend/.env.example`.
 6. Click **Apply**. Render will automatically provision, build, and link both services.
 
 ---
@@ -365,12 +347,7 @@ The project includes a root `vercel.json` file configuring both the React fronte
 
 1. Import your repository into the [Vercel Dashboard](https://vercel.com/new).
 2. Leave **Root Directory** as the root (`/`).
-3. Under **Environment Variables**, supply:
-   - `DATABASE_URL`
-   - `GROQ_API_KEY`
-   - `JWT_SECRET`
-   - `JWT_ALGORITHM` (`HS256`)
-   - `ACCESS_TOKEN_EXPIRE_MINUTES` (`60`)
+3. Under **Environment Variables**, supply the required production values as listed in `backend/.env.example`.
 4. Click **Deploy**. Vercel will build the frontend assets and route `/api/*` requests through the serverless FastAPI handler in `api/index.py`.
 
 ---
