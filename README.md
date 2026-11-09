@@ -10,7 +10,13 @@ Writing
 
 An end-to-end AI marketing content generation platform built with **FastAPI, React 19, Vite, Groq Cloud, Llama 3.3 70B Versatile, and MongoDB**. Generate high-quality, conversion-focused marketing content across multiple platforms in seconds.
 
-\<p align="center"\> \<img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white" /\> \<img src="https://img.shields.io/badge/FastAPI-0.115%2B-009688?style=flat-square&logo=fastapi&logoColor=white" /\> \<img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black" /\> \<img src="https://img.shields.io/badge/Vite-5.4-646CFF?style=flat-square&logo=vite&logoColor=white" /\> \<img src="https://img.shields.io/badge/Groq-Llama%203.3%2070B-F05032?style=flat-square&logo=groq&logoColor=white" /\> \<img src="https://img.shields.io/badge/MongoDB-Atlas%20%2F%20Beanie-47A248?style=flat-square&logo=mongodb&logoColor=white" /\> \<img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" /\> \</p\>
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Groq](https://img.shields.io/badge/Groq-Llama%203.3%2070B-F05032?style=for-the-badge&logo=groq&logoColor=white)](https://groq.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas%20%2F%20Beanie-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 ---
 
