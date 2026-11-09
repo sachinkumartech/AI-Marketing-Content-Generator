@@ -1,8 +1,8 @@
 services:
-  # --- Backend FastApi Web Service ---
+  # --- Backend FastAPI Web Service ---
   - type: web
     name: ai-marketing-backend
-    env: python
+    runtime: python
     region: singapore
     plan: free
     buildCommand: pip install -r backend/requirements.txt
@@ -17,6 +17,10 @@ services:
         sync: false
       - key: JWT_SECRET
         generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
       - key: CORS_ORIGINS
         value: "*"
       - key: ENVIRONMENT
@@ -25,7 +29,7 @@ services:
   # --- Frontend Vite Static Site ---
   - type: web
     name: ai-marketing-frontend
-    env: static
+    runtime: static
     region: singapore
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
@@ -39,3 +43,4 @@ services:
           type: web
           name: ai-marketing-backend
           property: host
+

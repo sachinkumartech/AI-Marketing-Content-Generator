@@ -69,7 +69,7 @@ docs/_build/
 profile_default/
 ipython_config.py
 
-# Environments
+# Environments & Secrets
 .env
 .env.*
 !.env.example
@@ -81,6 +81,16 @@ ENV/
 env.bak/
 venv.bak/
 backend/venv/
+*.pem
+*.key
+*.cer
+*.crt
+*.pfx
+*.p12
+credentials*.json
+client_secret*.json
+service_account*.json
+token*.json
 
 # Editor directories and files
 .vscode/
